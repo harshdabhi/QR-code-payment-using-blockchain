@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Success Page</title>
+  <style>
+    /* CSS styles */
+    body {
+      background-color: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .success-message {
+      text-align: center;
+    }
+    .success-message h1 {
+      color: #28a745;
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+  </style>
+  <script>
+    // Redirect to homepage after 5 seconds
+    setTimeout(function() {
+      window.location.href = '/';
+    }, 6000);
+  </script>
+</head>
+<body>
+  <div class="success-message">
+    <h1>Success!</h1>
+    <p>Your transaction was successful.</p>
+  </div>
+</body>
+</html>

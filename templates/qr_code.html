@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center">
+        <div class="card">
+          <h4 class=" text-primary">Generated QR code</h4>
+        </div>
+      </div>
+      <div class="card-body">
+        <img src={{ qr_code_img }} alt="Check server">
+      </div>
+      <p class="text-md-center">Transaction status</p>
+      <div class="spinner-border text-success" role="status">
+        <span class="sr-only"></span>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+{% csrf_token %}  <!-- Include the CSRF token here -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+    var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+    // Start the autopayment
+    function start_autopayment() {
+      $.ajax({
+        type: 'POST',
+        url: '/autopayment',
+        data: {m_wallet: '{{ m_wallet }}'},
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader('X-CSRFToken', csrftoken);  // Include the CSRF token in the request header
+        },
+        success: function(response) {
+          if (response.status == 'success') {
+            window.location.href = '/success_page';
+          }
+        },
+        error: function(xhr, textStatus, errorThrown) {
+          console.log('Error:', errorThrown);
+        }
+      });
+    }
+
+    // Call the start_autopayment function every 12 seconds
+    //as new blocks are generated every 12 second on eth
+    setInterval(start_autopayment, 12000);
+  });
+</script>
+
+<style>
+  /* CSS styles */
+  .container {
+    margin: 20px auto;
+    max-width: 500px;
+    background-size: cover;
+    background-position: center;
+  }
+  .card {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  .text-center {
+    text-align: center;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+</style>
+
+{% endblock body %}
