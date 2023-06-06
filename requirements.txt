@@ -2,4 +2,5 @@ web3
 configparser
 qrcode
 django
+pymongo[srv]
 -e .

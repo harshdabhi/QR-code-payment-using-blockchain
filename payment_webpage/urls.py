@@ -23,6 +23,8 @@ urlpatterns = [
     path("",views.homepage),
     path("qr_code",views.qr_code), 
     path("autopayment",views.start_autopayment),
+    path("autopayment_trx",views.start_autopayment_trx),
+    path("qr_code_trx",views.qr_code_trx),
     path("success_page",views.success_page),   
     re_path(r'^.*$',views.error_page)
 ]

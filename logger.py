@@ -1,13 +1,18 @@
 import logging
 import os
-import datetime
+from datetime import datetime
+import os
 
+LOG_FILE = f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S')}.log"
 
+logs_path = os.path.join(os.getcwd(), "logs", LOG_FILE)
 
-def logger():
-    os.mkdir('./log_file'+datetime.datetime.now().strftime(),exist_ok=True)
-    pass
-'''
-can code logging as per requirements
-'''
-    
+os.makedirs(logs_path, exist_ok=True)
+
+LOG_FILE_PATH = os.path.join(logs_path, LOG_FILE)
+
+logging.basicConfig(
+    filename=LOG_FILE_PATH,
+    format="[ %(asctime)s ] %(lineno)d %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)

@@ -31,8 +31,8 @@
     function start_autopayment() {
       $.ajax({
         type: 'POST',
-        url: '/autopayment',
-        data: {m_wallet: '{{ m_wallet }}',url:'{{url}}'},
+        url: '/autopayment_trx',
+        data: {m_wallet: '{{ m_wallet }}'},
         beforeSend: function(xhr) {
           xhr.setRequestHeader('X-CSRFToken', csrftoken);  // Include the CSRF token in the request header
         },
@@ -47,8 +47,8 @@
       });
     }
 
-    // Call the start_autopayment function every 12 seconds
-    //as new blocks are generated every 12 second on eth
+    // Call the start_autopayment 
+    //as new blocks are generated every 1second on trx
     setInterval(start_autopayment, {{interval}});
   });
 </script>

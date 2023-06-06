@@ -8,9 +8,9 @@ from dataclasses import dataclass
 import concurrent.futures
 
 # Set up web3 connection
-config=configparser.ConfigParser()
-config.read('config.ini')
-web3 = Web3(Web3.HTTPProvider(config['infura']['api_url']))
+# config=configparser.ConfigParser()
+# config.read('config.ini')
+# web3 = Web3(Web3.HTTPProvider(config['infura']['api_url']))
 
 @dataclass
 class payments:
@@ -36,31 +36,41 @@ class payments:
 
 
     def merchant_inputs(self,usd_value, merchant_wallet_address,payment_assest):
-        url = "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+       
 
-        response = requests.get(url)
-        data = response.json()
-
-        eth_price = data['ethereum']['usd']
-        
-        usdc_price = 1  # 1 USDC is equal to 1 USD
-
-        # Calculate equivalent amounts
-        eth_amount = usd_value / eth_price
-        usdc_amount = usd_value / usdc_price
-
-        # Create the payment string
-        eth_payment_string = f"ethereum:{merchant_wallet_address}?amount={eth_amount}"
-        usdc_payment_string = f"usdc:{merchant_wallet_address}?amount={usdc_amount}"
         
         if payment_assest=='usdc':
+           
+            usdc_amount = usd_value 
+            usdc_payment_string = f"usdc:{merchant_wallet_address}?amount={usdc_amount}"
+
             return usdc_payment_string
+        
+        elif payment_assest=='usdt':
+            usdt_amount = usd_value 
+            usdt_payment_string = f"usdt:{merchant_wallet_address}?amount={usdt_amount}"
+
+            return usdt_payment_string
+        
         else:
+            url = "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+
+            response = requests.get(url)
+            data = response.json()
+
+            eth_price = data['ethereum']['usd']
+
+        
+            # Calculate equivalent amounts
+            eth_amount = usd_value / eth_price
+            # Create the payment string
+            eth_payment_string = f"ethereum:{merchant_wallet_address}?amount={eth_amount}"
             return eth_payment_string
 
     
 
-    def get_transaction_status(self,tx_hash,wallet_address):
+    def get_transaction_status(self,tx_hash,wallet_address,url):
+        web3 = Web3(Web3.HTTPProvider(url))
 
         transaction = web3.eth.get_transaction(tx_hash)
         
@@ -82,14 +92,17 @@ class payments:
 
     
 
-    def auto_payment(self,wallet_address):
+    def auto_payment(self,wallet_address,url):
+        web3 = Web3(Web3.HTTPProvider(url))
+        
         found_transactions = []
 
         def process_transaction(tx_hash):
+
             tx = web3.eth.get_transaction(tx_hash)
             if tx['to'] == wallet_address:
                 print(tx)
-                found_transactions.append((tx['hash'], tx['from'], tx['to']))
+                found_transactions.append(tx)
 
         block = web3.eth.get_block('latest')
         transactions = block.transactions
@@ -104,6 +117,38 @@ class payments:
                 found_transactions.append(result)
 
         return found_transactions
+    
+    def auto_payment_trx(self,wallet_address):
+
+        try:
+            url = f'https://apilist.tronscan.org/api/transaction?sort=-timestamp&count=true&limit=1&start=0&address={wallet_address}'
+            response = requests.get(url)
+            data = response.json()
+            found_transactions = []
+        
+
+            if data['data'][0]['toAddress']==wallet_address:
+                transaction = data['data'][0]
+                found_transactions.append
+                (
+                f'Transaction Hash: {transaction["hash"]},From: {transaction["ownerAddress"]},To: {transaction["toAddress"]},To: {transaction["result"]},Timestamp:{transaction["timestamp"]}')
+
+                #( f'Transaction Hash: {transaction["hash"]},From: {transaction["ownerAddress"]},To: {transaction["toAddress"]},To: {transaction["result"]},Timestamp:{transaction["timestamp"]},{int(transaction["trigger_info"]["parameter"]["_value"])/10**6}')
+               
+                return found_transactions
+            else:
+                return []
+            
+
+        except Exception as e:
+            print('Error occurred:', e)
+
+    
+
+ 
+
+
+        
 
         # result = auto_payment()
 
