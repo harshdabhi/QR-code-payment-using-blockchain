@@ -26,5 +26,8 @@ urlpatterns = [
     path("autopayment_trx",views.start_autopayment_trx),
     path("qr_code_trx",views.qr_code_trx),
     path("success_page",views.success_page),   
+    #path("",views.pages_login),
+    path("pages_register",views.pages_register),
+    path("pages-error-404",views.error_page),
     re_path(r'^.*$',views.error_page)
 ]

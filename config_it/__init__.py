@@ -6,5 +6,5 @@ MONGODB_CRED_DB:str='credentials'
 MONGODB_COLL:str='api_keys'
 
 
-MONGODB_CRED_CUST:str='customer_login'
-MONGODB_CUST_LOG:str='transaction_log'
+MONGODB_CRED_CUST:str='customer'
+MONGODB_CUST_LOG:str='login_cred'

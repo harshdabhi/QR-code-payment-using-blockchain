@@ -22,10 +22,10 @@
     }
   </style>
   <script>
-    // Redirect to homepage after 5 seconds
+    // Redirect to homepage after 10 seconds
     setTimeout(function() {
       window.location.href = '/';
-    }, 6000);
+    }, 10000);
   </script>
 </head>
 <body>
@@ -33,7 +33,12 @@
     <h1>Success!</h1>
     <p>Your transaction was successful.</p>
 
-    <p>{{temp}}</p>
+    <ul class="column">
+      {% for value in temp %}
+        <li>{{ value }}</li>
+      {% endfor %}
+    </ul>
+    
   </div>
 </body>
 </html>

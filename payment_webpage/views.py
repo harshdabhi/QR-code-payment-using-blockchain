@@ -2,16 +2,25 @@ from django.shortcuts import render,redirect
 from django.views.decorators.csrf import csrf_protect
 from payment_repo.pay import payments
 import os
-from config_it import MONGODB_CRED_DB,MONGODB_COLL
+from config_it import MONGODB_CRED_DB,MONGODB_COLL,MONGODB_CRED_CUST,MONGODB_CUST_LOG
 from config_it.config_keys import config_value
+from django.http import JsonResponse
 
 
 # Create your views here. 
+# def login_required(view_func):
+#     def wrapper(request, *args, **kwargs):
+#         # Check if the user is authenticated
+#         if not request.session.get('authenticated'):
+#             return render(request,'pages_login.html',{'message':'Invalid user'}) 
+
+#         return view_func(request, *args, **kwargs)
+#     return wrapper
 
 
 def homepage(request):
     global qr_code_file_name,m_wallet_name,url
-    if request.method=='POST':
+    if request.method=='POST':  
         payment_mode=request.POST.get('payment')
         amount=int(request.POST.get('amount'))
         m_wallet=request.POST.get('m_wallet')
@@ -31,7 +40,7 @@ def homepage(request):
 
         interval_dict={
             'eth':10000, #10 sec
-            'trx':0
+            'trx':0 
         }  
 
         interval=interval_dict[chain]
@@ -67,17 +76,17 @@ def homepage(request):
 
     #return render(request,'homepage.html')
 
+
 def qr_code(request):
     return render(request,'qr_code.html')
+
 
 def qr_code_trx(request):
     return render(request,'qr_code_trx.html')
 
 
-
-from django.http import JsonResponse
-
 def start_autopayment(request):
+    global temp
 
     if request.method == 'POST':
         m_wallet = request.POST.get('m_wallet')
@@ -99,21 +108,21 @@ def start_autopayment(request):
 
 
 def start_autopayment_trx(request):
+    
     global temp
-
     if request.method == 'POST':
         m_wallet = request.POST.get('m_wallet')
         
         p_ = payments()
-        temp = p_.auto_payment_trx(m_wallet)
-        if temp != []:
-            
-            status = 'success'
+        temp = p_.auto_payment_trx(m_wallet) 
+        if temp != []:  
+            print(temp)
+            status = 'success' 
         
         else:
             status = 'pending'
 
-             
+              
         return JsonResponse({'status': status})  # Return a JsonResponse with the status
 
     return JsonResponse({'status': 'error'}) 
@@ -122,6 +131,74 @@ def start_autopayment_trx(request):
 def error_page(request):
     return render(request,'error_page.html')  
 
+
 def success_page(request):
-    os.remove('./static/'+qr_code_file_name) 
-    return render(request,'success_page.html',{'temp':temp})  
+    os.remove('./static/'+qr_code_file_name)  
+    return render(request,'success_page.html',{'temp':temp})    
+
+def pages_login(request):
+    
+   
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password') 
+        c_=config_value()
+        keys=c_.value_retrieve(MONGODB_CRED_CUST,MONGODB_CUST_LOG,{'username':username})
+        
+        
+        try:
+            password_check=keys['password'] 
+            if password_check==password: 
+                request.session['authenticated'] = True
+                 
+                return render(request,'homepage.html')
+            
+        except Exception as e:
+            
+            return render(request, 'pages_login.html',{'message':'Invalid user'})
+        
+    
+    return render(request, 'pages_login.html') 
+
+
+
+def pages_register(request):
+    c_=config_value()
+    keys=c_.value_retrieve(MONGODB_CRED_CUST,'registration',{'name':'status'})
+    if keys['enabled']=='no':
+        return redirect('/pages-error-404')
+    
+    else:
+
+
+        try:
+
+            if request.method == 'POST':
+                name = request.POST.get('name')
+                email = request.POST.get('email')
+                username = request.POST.get('username')
+                password = request.POST.get('password')
+
+                dict_inputs={
+                    'name':name,
+                    'email':email,
+                    'username':username,
+                    'password':password
+                }
+    
+                
+
+                d=config_value()
+
+                d.value_input(MONGODB_CRED_CUST,MONGODB_CUST_LOG,dict_inputs)
+                return redirect('/pages_login')
+            
+            else:
+                return render(request,'pages_register.html')
+                
+        except Exception as e:
+            print(e)
+    
+
+def pages_error(request):
+    return render(request,'pages-error-404.html')

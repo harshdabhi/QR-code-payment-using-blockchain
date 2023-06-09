@@ -98,11 +98,10 @@ class payments:
         found_transactions = []
 
         def process_transaction(tx_hash):
-
+ 
             tx = web3.eth.get_transaction(tx_hash)
             if tx['to'] == wallet_address:
-                print(tx)
-                found_transactions.append(tx)
+                found_transactions.append(f"Transaction Hash: {tx}")
 
         block = web3.eth.get_block('latest')
         transactions = block.transactions
@@ -129,9 +128,8 @@ class payments:
 
             if data['data'][0]['toAddress']==wallet_address:
                 transaction = data['data'][0]
-                found_transactions.append
-                (
-                f'Transaction Hash: {transaction["hash"]},From: {transaction["ownerAddress"]},To: {transaction["toAddress"]},To: {transaction["result"]},Timestamp:{transaction["timestamp"]}')
+                found_transactions.append(transaction)
+                #found_transactions.append(f'Transaction Hash: {transaction["hash"]},From: {transaction["ownerAddress"]},To: {transaction["toAddress"]},Result: {transaction["result"]},Timestamp:{transaction["timestamp"]}')
 
                 #( f'Transaction Hash: {transaction["hash"]},From: {transaction["ownerAddress"]},To: {transaction["toAddress"]},To: {transaction["result"]},Timestamp:{transaction["timestamp"]},{int(transaction["trigger_info"]["parameter"]["_value"])/10**6}')
                
